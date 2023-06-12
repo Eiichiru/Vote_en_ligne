@@ -12,13 +12,13 @@ send() {
     local _i
 
     for ((_i = 0; _i < $NBRETRY; ++_i)); do
-        nc $HOST $PORT -q 0 2>/dev/null && break
+        nc $HOST $PORT 2> /dev/null && break
     done
 }
 
 recv() {
     [ $# -lt 1 ] && echo "Usage: $FUNCNAME host:port" >&2 && return 1
     local PORT=$(_port $1)
-    nc -l -p $PORT -q 0
+    nc -l $PORT 
 
 }
