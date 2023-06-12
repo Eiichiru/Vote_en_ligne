@@ -7,32 +7,32 @@ Clé personnelle valide !
 
 Pour qui souhaitez vous voter ?
 
-Alice
-Bob
-Eve
+1 : Alice
+2 : Bob
+3 : Eve
 
-Entrez le nom de la personne que vous souhaitez élire :"
+Entrez le numéro de la personne que vous souhaitez élire :"
 
 while true; do
-    read nom1
+    read choix1
 
     #Verif du premier nom
-    if [ "$nom1" == "Alice" ] || [ "$nom1" == "Bob" ] || [ "$nom1" == "Eve" ]; then
-        echo "Confirmez le prénom choisi : "
+    if [ "$choix1" == "1" ] || [ "$choix1" == "2" ] || [ "$choix1" == "3" ]; then
+        echo "Confirmez votre choix : "
     else
-        echo "Nom non valide. Veuillez choisir un nom présent dans la liste"
+        echo "Choix non valide. Veuillez choisir un numéro présent dans la liste"
         continue
     fi
 
     #Confirmation
  
-    read nom2
+    read choix2
 
     #Verif de la confirmation
-    if [ "$nom1" == "$nom2" ]; then
+    if [ "$choix1" == "$choix2" ]; then
         echo "Votre vote a bien été pris en compte, merci"
         break
     else
-        echo "Les noms ne correspondent pas. Veuillez indiquer 2 fois le même nom."
+        echo "Vos 2 choix ne correspondent pas. Veuillez indiquer 2 fois le même numéro."
     fi
 done
