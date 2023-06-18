@@ -68,5 +68,5 @@ echo "Génération de la clé public pour le server ..."
 openssl rsa -in MyPrivateKey.pem -pubout -out publicKey/"$NNI"_public.pem
 
 
-echo "$NNI:$Nom:$Prenom:$adresse:$date::::$mdp1:$mdp2 \n" >> database/"$ville"_database.txt 
+echo "$NNI:$Nom:$Prenom:$adresse:$date::::$mdp1:$mdp2 " >> database/"$ville"_database.txt 
 
