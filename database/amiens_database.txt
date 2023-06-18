@@ -1,5 +1,1 @@
-lignecol:1:truc 
-lignecol:2:truc
-lignecol:3:truc
 
-coucou
