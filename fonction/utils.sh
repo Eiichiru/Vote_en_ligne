@@ -1,4 +1,4 @@
-source config
+source fonction/config
 
 NBRETRY=3
 

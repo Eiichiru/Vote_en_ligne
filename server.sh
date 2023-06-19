@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source fonction/utils.sh
+source fonction/utils4mac.sh
 source fonction/fonctions.sh
 
 
@@ -17,17 +17,20 @@ while true; do
         ID=$(recv $Server)
 
         #reception du mdp chiffré
-        encrypted_password=$(recv $Server)
-
-        #dechiffrement du mdp 
-        MDP=$(dechiffrementMDP $encrypted_password publicKey/private_Server_key.pem)
+        recv $Server > encrypted_password.txt
 
         #reception de la ville
         ville=$(recv $Server)
 
+        #dechiffrement du mdp 
+        MDP=$(dechiffrementMDP encrypted_password.txt publicKey/private_Server_key.pem)
+        rm encrypted_password.txt
+
+        echo "DEBUG > ID : "$ID
+        echo "DEBUG > MDP : "$MDP
+        echo "DEBUG > ID : "$ville
         #fonction de verification id/mdp
         verifConnexion $ID $MDP $ville
-
 
         ;;
     "...")
