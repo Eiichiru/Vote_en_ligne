@@ -1,19 +1,55 @@
 #!/bin/bash
 
+source fonction/utils.sh
+source fonction/fonctions.sh
+
 echo "Veuillez vous identifier
 Entrez votre identifiant :"
 read ID
 
-#fonction verifId
-#if [] chercher dans la liste
-
 echo "Entrez votre mot de passe :"
 read password
 
-#fonction verifMDP
-#if [] chercher dans la liste
+echo "Entrez votre ville :"
+read ville
 
-echo "$ID $password"
+#Initialisation de la connexion avec le server
+send $Server <<< "init connexion"
+
+#reception de la clé public du server
+recv $Client > clientPublicKey.pub
+
+#envoie de l'ID au server
+send $Server <<< $ID
+
+#chiffrement et envoie du mdp au server
+encrypted_password=$(chiffrementMDP $password clientPublicKey.pub)
+send $Server <<< $encrypted_password
+
+#envoie de la ville au server
+send $Server <<< $ville
+
+#reception de la reponse du server
+reponse=$(recv $Client)
+typeConnexion=0 #variable permetant de savoir si le vote est a prendre en compte ou pas
+case "$reponse" in
+    "connexion1")
+    typeConnexion=1
+    echo "Connexion autorisée"
+    ;;
+    "connexion2")
+    typeConnexion=2
+    echo "Connexion autorisée"
+    ;;
+    "connexion3")
+    echo "Connexion refusée ..."
+    exit 1
+    ;;
+  *)
+    echo "Erreur Inconnue ..."
+    exit 1
+    ;;
+esac
 
 echo "Connexion autorisée
 Bienvenue sur votre bureau de vote en ligne.
@@ -31,35 +67,32 @@ action=0
 while [[ $action -lt 1 || $action -gt 7 ]]; do
     read action
 
-    if [[ $action =~ ^[1-7]$ ]]; then
+    if [[ $action =~ ^[1-6]$ ]]; then
         case $action in
             1)
                 echo "Voter en votre nom"
-                
+                ./vote.sh $typeConnexion
                 ;;
             2)
                 echo "2 : Voter pour quelqu'un d'autre (procuration)"
-                
+                ./vote_procuration.sh
                 ;;
             3)
                 echo "3 : Observer l'urne"
-                
+                ./urne
+                # + compteur
                 ;;
             4)
                 echo "4 : Voir la liste électorale de votre ville"
-                
+                ./liste_electorale
                 ;;
             5)
-                echo "5 : Voir le compteur de votes"
-                
+                echo "6 : Créer une procuration"
+                ./creation_procuration.sh
                 ;;
             6)
-                echo "6 : Créer une procuration"
-                
-                ;;
-            7)
                 echo "7 : Déclarer une protestation"
-                
+                ./protestation.sh
                 ;;
         esac
     else
