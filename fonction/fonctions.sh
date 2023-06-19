@@ -1,4 +1,4 @@
-source fonction/utils.sh
+source fonction/utils4mac.sh
 
 #openssl genpkey -algorithm RSA -out private.pem
 #openssl rsa -in private.pem -pubout -out public.pem
@@ -77,8 +77,6 @@ chiffrementMDP() {
     openssl rsautl -encrypt -pubin -inkey $2 -in mdp.txt -out encrypted_password.bin
 
     rm mdp.txt
-    cat encrypted_password.bin
-    rm encrypted_password.bin
 }
 #chiffrement $MDP public.pem
 
@@ -88,16 +86,13 @@ dechiffrementMDP() {
         return 2
     fi
 
-    echo $1 > encrypted_password.txt
-
     #Dechiffrement de la clé symetrique avec la clé privé du serveur 
-    openssl rsautl -decrypt -inkey $2 -in encrypted_password.txt -out decrypted_password.txt
+    openssl rsautl -decrypt -inkey $2 -in $1 -out decrypted_password.txt
 
-    rm encrypted_password.txt
     cat decrypted_password.txt
     rm decrypted_password.txt
 }
-#chiffrement $encrypted_password publicKey/private_Server_key.pem
+#chiffrement encrypted_password.txt publicKey/private_Server_key.pem
 
 verifConnexion() {
     if [ $# -ne 3 ]; then
@@ -108,14 +103,16 @@ verifConnexion() {
     do
         IDinFile=$(echo "$ligne" | cut -d ':' -f1)
         MDPinFile=$(echo "$ligne" | cut -d ':' -f9)
-        if [ "$IDinFile" = "$1" ] && [ "$MDPinFile" = "$2" ]; then
-            send $Client <<< "connexion1"
-        else
-            MDPinFile=$(echo "$ligne" | cut -d ':' -f10)
+        if [ "$IDinFile" = "$1" ] ; then
             if [ "$IDinFile" = "$1" ] && [ "$MDPinFile" = "$2" ]; then
-                send $Client <<< "connexion2"
+                send $Client <<< "connexion1"
             else
-                send $Client <<< "connexion3"
+                MDPinFile=$(echo "$ligne" | cut -d ':' -f10)
+                if [ "$IDinFile" = "$1" ] && [ "$MDPinFile" = "$2" ]; then
+                    send $Client <<< "connexion2"
+                else
+                    send $Client <<< "connexion3"
+                fi
             fi
         fi
     done

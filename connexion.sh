@@ -23,8 +23,9 @@ recv $Client > clientPublicKey.pub
 send $Server <<< $ID
 
 #chiffrement et envoie du mdp au server
-encrypted_password=$(chiffrementMDP $password clientPublicKey.pub)
-send $Server <<< $encrypted_password
+chiffrementMDP $password clientPublicKey.pub
+cat encrypted_password.bin | send $Server
+rm encrypted_password.bin
 
 #envoie de la ville au server
 send $Server <<< $ville
@@ -51,7 +52,7 @@ case "$reponse" in
     ;;
 esac
 
-echo "Connexion autorisée
+echo "
 Bienvenue sur votre bureau de vote en ligne.
 Menu :
 1 : Voter en votre nom 
