@@ -1,5 +1,13 @@
 #!/bin/bash
 
+source fonction/utils4mac.sh
+source fonction/fonctions.sh
+
+if [ $# -ne 2 ]; then
+    echo "Error..."
+    return 2
+fi
+
 echo "Verification de votre clé de chiffrement personnelle ...
 (On verifie que la clé USB fournie est bien branchée)
 
@@ -19,14 +27,11 @@ while true; do
     #Verif du premier nom
     if [ "$choix1" == "1" ] || [ "$choix1" == "2" ] || [ "$choix1" == "3" ]; then
         echo "Confirmez votre choix : "
+        read choix2
     else
         echo "Choix non valide. Veuillez choisir un numéro présent dans la liste"
         continue
     fi
-
-    #Confirmation
- 
-    read choix2
 
     #Verif de la confirmation
     if [ "$choix1" == "$choix2" ]; then
@@ -34,5 +39,14 @@ while true; do
         break
     else
         echo "Vos 2 choix ne correspondent pas. Veuillez indiquer 2 fois le même numéro."
+        continue
     fi
 done
+
+#Initialisation de la sequence de vote
+send $Server <<< "init vote"
+
+#creation du signé
+sign=$(signature $1 MyPrivateKey.pem)
+
+
