@@ -49,4 +49,6 @@ send $Server <<< "init vote"
 #creation du signé
 sign=$(signature $1 MyPrivateKey.pem)
 
+#creation du chiffré
+
 
