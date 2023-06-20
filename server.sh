@@ -32,8 +32,9 @@ while true; do
         #fonction de verification id/mdp
         verifConnexion $ID $MDP $ville
 
+        continue
         ;;
-    "...")
+    "init vote")
         echo "..."
         ;;
     "...")

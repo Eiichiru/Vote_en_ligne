@@ -72,7 +72,7 @@ while [[ $action -lt 1 || $action -gt 7 ]]; do
         case $action in
             1)
                 echo "Voter en votre nom"
-                ./vote.sh $typeConnexion
+                ./vote.sh $ID $typeConnexion
                 ;;
             2)
                 echo "2 : Voter pour quelqu'un d'autre (procuration)"

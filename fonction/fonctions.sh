@@ -119,3 +119,28 @@ verifConnexion() {
 
 }
 #verifConnexion $ID $MDP $ville
+
+signature() {
+    if [ $# -ne 2 ]; then
+        echo "La fonction attend exactement 2 arguments."
+        return 2
+    fi
+
+    echo -n "$1" | openssl dgst -sign "$2" -keyform PEM -sha256 -out signature.sign
+
+    echo $signature
+
+}
+#signature $dataToSign $clientPrivateKey
+
+verification() {
+    if [ $# -ne 2 ]; then
+        echo "La fonction attend exactement 2 arguments."
+        return 2
+    fi
+
+    echo -n "$3" | openssl dgst -verify "$2" -keyform PEM -sha256 -signature "$1"
+
+    echo $?
+}
+#verification $signedData $clientpublicKey #IDClient

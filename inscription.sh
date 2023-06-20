@@ -63,9 +63,9 @@ echo "Génération de votre clé privé ..."
 openssl genpkey -algorithm RSA -out MyPrivateKey.pem
 echo "le fichier MyPrivateKey.pem a été placé sur votre clé USB"
 
-#Génération de la clé public
+#Génération de la clé public pour le server
 echo "Génération de la clé public pour le server ..." 
-openssl rsa -in MyPrivateKey.pem -pubout -out publicKey/"$NNI"_public.pem
+openssl rsa -in MyPrivateKey.pem -pubout -out key/"$NNI"_public.pem
 
 
 echo "$NNI:$Nom:$Prenom:$adresse:$date::::$mdp1:$mdp2 " >> database/"$ville"_database.txt 
