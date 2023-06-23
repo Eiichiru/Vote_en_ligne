@@ -61,27 +61,25 @@ while true; do
         echo "DEBUG: deconversion"
 
         #vérification du signé et donc de l'identité
-        echo "sign : "$sign
-        echo "ID : "$ID
         verif=$(verificationSign deconv.txt server/key/"$ID"_public.pem $ID)
-        if [ "$verif" -eq 1 ] ; then
+        if [ "$verif" == "1" ] ; then
             send $Client <<< "1"
             echo "Erreur : signé invérifiable" && exit 1 
         else
-            send $Client <<< "1"
+            send $Client <<< "0"
         fi
         echo "DEBUG: identité verifié"
         rm deconv.txt
         
-        #vérification de l'heure
-        verif=$(verifHeure)
-        if [ "$verif" -eq 1 ] ; then
-            send $Client <<< "1"
-            echo "Erreur : Heure non valide" && exit 1 
-        else
-            send $Client <<< "0"
-        fi
-        echo "DEBUG: heure verifié"
+        # #vérification de l'heure
+        # verif=$(verifHeure)
+        # if [ "$verif" == "1" ] ; then
+        #     send $Client <<< "1"
+        #     echo "Erreur : Heure non valide" && exit 1 
+        # else
+        #     send $Client <<< "0"
+        # fi
+        # echo "DEBUG: heure verifié"
 
         #vérification de si la personne a déja voté
         verif=$(verifVote $ID $ville)
@@ -99,29 +97,44 @@ while true; do
         echo "DEBUG: création du hashé"
 
         #vérification de type de connexion 
-        if [ "$2" -eq 1 ] ; then
-            
+        if [ "$2" == "1" ] ; then
             #prise en compte du vrai vote 
             #nextStep : chiffrer avec clé public d'une instance au dessus
-            cat deconcatenate4.txt > server/database/"$ville"_vote.txt
+            convBase64 deconcatenate4.txt
+            cat base64.bin > server/database/"$ville"_vote.txt
             rm deconcatenate4.txt
+            rm base64.bin
         else    
             #creation d'un vote blanc pour que le vote ne soit pas prit en compte
             #nextStep : chiffrer avec clé public d'une instance au dessus
             chiffrementPubKey VoteBlanc server/key/public_Server_key.pem
-            cat encrypted_file.bin > server/database/"$ville"_vote.txt
+            convBase64 encrypted_file.bin
+            cat base64.bin > server/database/"$ville"_vote.txt
             rm encrypted_file.bin
+            rm base64.bin
         fi
         echo "DEBUG: vote prit en compte"
 
+        #convertion du hashé
+        echo -n $hash > hash.txt
+        convBase64 hash.txt
+        rm hash.txt
+
         #ajout du hashé dans la database
-        #a converir en base64
-        addInfo $ID $hash col6 $ville
+        addInfo $ID $(cat base64.bin) col6 $ville
+        rm base64.bin
+
         echo "DEBUG: ajout fingerprint"
 
         #envoie de la reponse au client
-        send $Client <<< "vote ok"
+        send $Client <<< "voteOk"
         
+        rm deconcatenate3.txt
+        rm deconcatenate4.txt
+        rm decrypted_key.txt
+
+        echo "INFO: Vote terminé"
+
         continue
         ;;
     "...")
