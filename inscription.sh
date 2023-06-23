@@ -38,7 +38,7 @@ date=$(date +'%m/%d/%Y')
 
 
 #Vérification : L'utilisateur n'est pas déja inscrit dans une liste 
-for fichier in database/*_database.txt; do
+for fichier in server/database/*_database.txt; do
     cat "$fichier" | while read -r ligne
     do
         premiere_colonne=$(echo "$ligne" | cut -d ':' -f1)
@@ -47,6 +47,11 @@ for fichier in database/*_database.txt; do
         fi
     done
 done
+
+#Verification : utilisateur majeure
+if [ "$age" -lt 18 ]; then
+    echo "Vous n'êtes pas majeure" && exit 1
+fi
 
 #Génération des mot de passe alétoires
 echo "Génération des mots de passes. Notez les bien ..."
@@ -60,13 +65,12 @@ echo $mdp2
 
 #Génération de la clé privé
 echo "Génération de votre clé privé ..."
-openssl genpkey -algorithm RSA -out MyPrivateKey.pem
+openssl genpkey -algorithm RSA -out client/key/MyPrivateKey.pem
 echo "le fichier MyPrivateKey.pem a été placé sur votre clé USB"
 
 #Génération de la clé public pour le server
 echo "Génération de la clé public pour le server ..." 
-openssl rsa -in MyPrivateKey.pem -pubout -out key/"$NNI"_public.pem
+openssl rsa -in client/key/MyPrivateKey.pem -pubout -out server/key/"$NNI"_public.pem
 
-
-echo "$NNI:$Nom:$Prenom:$adresse:$date::::$mdp1:$mdp2 " >> database/"$ville"_database.txt 
+echo "$NNI:$Nom:$Prenom:$adresse:$date::::$mdp1:$mdp2 " >> server/database/"$ville"_database.txt 
 
