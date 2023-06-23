@@ -23,7 +23,7 @@ recv $Client > clientPublicKey.pub
 send $Server <<< $ID
 
 #chiffrement et envoie du mdp au server
-chiffrementMDP $password clientPublicKey.pub
+chiffrementPubKey $password clientPublicKey.pub
 cat encrypted_password.bin | send $Server
 rm encrypted_password.bin
 
