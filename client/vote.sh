@@ -93,10 +93,10 @@ if [ $(recv $Client) -eq 1 ] ; then
     echo "Erreur : Votre signé n'est pas verifié par la clé que le server possede" && exit 1
 fi
 
-#reception de la reponse de verification de l'heure
-if [ $(recv $Client) -eq 1 ] ; then
-    echo "Erreur : Heure non-valide " && exit 1
-fi
+# #reception de la reponse de verification de l'heure
+# if [ $(recv $Client) -eq 1 ] ; then
+#     echo "Erreur : Heure non-valide " && exit 1
+# fi
 
 #reception de la reponse de verification si la personne à déjà voté
 if [ $(recv $Client) -eq 1 ] ; then
@@ -104,6 +104,6 @@ if [ $(recv $Client) -eq 1 ] ; then
 fi
 
 #reception de la reponse de prise en compte du vote
-if [ $(recv $Client) -eq "vote ok" ] ; then
-    echo "Info : Votre vote à bien été prit en compte " && exit 0
+if [ $(recv $Client) == "voteOk" ] ; then
+    echo "INFO : Votre vote à bien été prit en compte " && exit 0
 fi
