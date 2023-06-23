@@ -3,7 +3,7 @@ M1 Protocole Sécurisé - Projet de vote en ligne
 
 <Br>
 <Br>
-:warning:   ** Il est primordiale d'éxécuter les script à la racine **   :warning:
+:warning:   **Il est primordiale d'éxécuter les script à la racine**   :warning:
 
 
 ex :
