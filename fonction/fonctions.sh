@@ -14,7 +14,6 @@ chiffrementSym() {
     #Génération du random (clé symétrique)
     openssl rand -hex 16 > symKey.txt
 
-    
     #Chiffrement de la clé symetrique avec la clé publique du serveur 
     openssl rsautl -encrypt -pubin -inkey $2 -in symKey.txt -out encrypted_key.bin
     symKey=$(cat symKey.txt)
@@ -25,7 +24,7 @@ chiffrementSym() {
     #Suppression des fichiers inutiles
     rm symKey.txt
 }
-#chiffrement message.txt public.pem
+#chiffrementSym fichierConcatener.txt public.pem
 
 dechiffrementSym() {
     if [ $# -ne 3 ]; then
@@ -65,34 +64,34 @@ sendPublicKey() {
 
 }
 
-chiffrementMDP() {
+chiffrementPubKey() {
     if [ $# -ne 2 ]; then
         echo "La fonction attend exactement 2 arguments."
         return 2
     fi
 
-    echo $1 > mdp.txt
+    echo $1 > filetochif.txt
 
     #Chiffrement du mdp avec la clé publique du serveur 
-    openssl rsautl -encrypt -pubin -inkey $2 -in mdp.txt -out encrypted_password.bin
+    openssl rsautl -encrypt -pubin -inkey $2 -in filetochif.txt -out encrypted_file.bin
 
-    rm mdp.txt
+    rm filetochif.txt
 }
-#chiffrement $MDP public.pem
+#chiffrementPubKey $MDP public.pem
 
-dechiffrementMDP() {
+dechiffrementPubKey() {
     if [ $# -ne 2 ]; then
         echo "La fonction attend exactement 2 arguments."
         return 2
     fi
 
     #Dechiffrement de la clé symetrique avec la clé privé du serveur 
-    openssl rsautl -decrypt -inkey $2 -in $1 -out decrypted_password.txt
+    openssl rsautl -decrypt -inkey $2 -in $1 -out decrypted_file.txt
 
-    cat decrypted_password.txt
-    rm decrypted_password.txt
+    cat decrypted_file.txt
+    rm decrypted_file.txt
 }
-#chiffrement encrypted_password.txt publicKey/private_Server_key.pem
+#chiffrement encrypted_file.txt publicKey/private_Server_key.pem
 
 verifConnexion() {
     if [ $# -ne 3 ]; then
@@ -128,12 +127,12 @@ signature() {
 
     echo -n "$1" | openssl dgst -sign "$2" -keyform PEM -sha256 -out signature.sign
 
-    echo $signature
+    #echo $signature
 
 }
 #signature $dataToSign $clientPrivateKey
 
-verification() {
+verificationSign() {
     if [ $# -ne 2 ]; then
         echo "La fonction attend exactement 2 arguments."
         return 2
@@ -143,49 +142,119 @@ verification() {
 
     echo $?
 }
-#verification $signedData $clientpublicKey #IDClient
+#verificationSign $signedData clientpublicKey.pem #IDClient
 
-chiffrementConcatenation() {
-    start_marker="#!START#!"
-    end_marker="#!END#!"
 
-    # Chiffrer la première donnée
-    openssl rsautl -encrypt -pubin -inkey ../key/public.pem -in text.txt -out encrypted_text.bin
-    cat encrypted_text.bin | base64 > base64_1.bin
-    rm encrypted_text.bin
-
-    # Chiffrer la deuxième donnée
-    openssl rsautl -encrypt -pubin -inkey ../key/public.pem -in text2.txt -out encrypted_text2.bin
-    cat encrypted_text2.bin | base64 > base64_2.bin
-    rm encrypted_text2.bin
-
-    # Concaténer les deux textes chiffrés
-    echo -n $start_marker >> concatenateFile.txt
-    cat base64_1.bin >> concatenateFile.txt
-    echo -n $end_marker >> concatenateFile.txt
-    echo -n $start_marker >> concatenateFile.txt
-    cat base64_2.bin >> concatenateFile.txt
-    echo -n $end_marker >> concatenateFile.txt
+convBase64() {
+    cat $1 | base64 > base64.bin
 }
-#chiffrementConcatenation fichier1.txt fichier2.txt
+#convBase64 fileToConv.txt
 
-dechiffrementConcatenation() {
+deconvBase64() {
+    cat $1 | base64 -d > deconv.txt
+}
+#deconvBase64 fileToDeconv.txt
+
+concatenation() {
     start_marker="#!START#!"
     end_marker="#!END#!"
 
-    #recupere la partie 1
-    awk -v RS="$end_marker" '/'"$start_marker"'/{print substr($0, length("'"$start_marker"'")+1)}' <<< $(cat concatenateFile.txt) | awk 'NR==1' > deconcatenate1.txt
-    cat deconcatenate1.txt | base64 -d | openssl rsautl -decrypt -inkey ../key/private.pem > decrypted1.txt
-    rm deconcatenate1.txt
+    for file in $*
+    do
+        echo -n $start_marker >> concatenateFile.txt
+        cat $file >> concatenateFile.txt
+        echo -n $end_marker >> concatenateFile.txt
+    done
+}
+#concatenation file1.txt file2.txt ... filen.txt
 
-    #recupere la partie 2
-    awk -v RS="$end_marker" '/'"$start_marker"'/{print substr($0, length("'"$start_marker"'")+1)}' <<< $(cat concatenateFile.txt) | awk 'NR==2' > deconcatenate2.txt
-    cat deconcatenate2.txt | base64 -d | openssl rsautl -decrypt -inkey ../key/private.pem > decrypted2.txt
-    rm deconcatenate2.txt
+deconcatenation() {
+    start_marker="#!START#!"
+    end_marker="#!END#!"
 
-    rm base64_1.bin
-    rm base64_2.bin
+    #recuperation du nombre de fichier qui ont été concatené 
+    nbFile=$(grep -o '#!START#!' $1 | wc -l | sed 's/ //g')
+    
+    #recupation de chaque partie 
+    for (( i=1; i<=$nbFile; i++ ))
+    do  
+        awk -v RS="$end_marker" '/'"$start_marker"'/{print substr($0, length("'"$start_marker"'")+1)}' <<< $(cat $1) | awk 'NR=='$i > deconcatenate$i.txt
+    done
     rm concatenateFile.txt
 
 }
-#dechiffrementConcatenation() concatenateFile.txt
+#deconcatenation concatenateFile.txt 
+
+verifHeure() {
+    heure=$(date +%H) 
+
+    if (( heure >= 8 && heure < 20 )); then
+        echo 0 
+    else
+        echo 1 
+    fi
+}
+#verifHeure
+
+verifVote() {
+    if [ $# -ne 2 ]; then
+        echo "La fonction attend exactement 2 arguments."
+        return 2
+    fi
+    cat database/"$2"_database.txt | while read -r ligne
+    do
+        IDinFile=$(echo "$ligne" | cut -d ':' -f1)
+        fingerprint=$(echo "$ligne" | cut -d ':' -f6)
+        if [ "$IDinFile" = "$1" ] ; then
+            if [ "$fingerprint" = "" ] ; then
+                echo 0
+            else
+                echo 1
+            fi
+        fi
+    done
+}
+#verifVote $ID $ville
+
+addInfo() {
+    file="database/"$4"_database.txt"
+    search_id=$1
+    new_data=$2
+
+    # Création d'un fichier temporaire pour stocker les modifications
+    temp_file=$(mktemp)
+
+    # Parcours du fichier et mise à jour de la ligne appropriée
+    cat "$file" | while IFS=: read -r col1 col2 col3 col4 col5 col6 col7 col8; do
+        if [ "$col1" = "$search_id" ]; then
+            case $3 in
+            "col2")
+                col2=$2
+                ;;
+            "col3")
+                col3=$2
+                ;;
+            "col4")
+                col4=$2
+                ;;
+            "col5")
+                col5=$2
+                ;;
+            "col6")
+                col6=$2
+                ;;
+            "col7")
+                col7=$2
+                ;;
+            "col8")
+                col8=$2
+                ;;
+            esac
+        fi
+        echo "$col1:$col2:$col3:$col4:$col5:$col6:$col7:$col8" >> "$temp_file"
+    done
+
+    # Remplacement du fichier d'origine par le fichier temporaire modifié
+    mv "$temp_file" "$file"
+}
+#addInfo $ID $InfoToAdd $numColonne(/!\ Format colX) $ville
