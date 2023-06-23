@@ -40,26 +40,22 @@ dechiffrementSym() {
 
     #Dechiffrement du message avec la clé symétrique 
     openssl enc -d -aes-256-cbc -K $symKey -iv "$iv" -in $2 -out decrypted_message.txt
-    cat decrypted_message.txt
-
-    #Suppression des fichiers inutiles 
-    rm encrypted_message.txt 
-    rm encrypted_key.bin
+    #cat decrypted_message.txt
 
 }
 #dechiffrement encrypted_key.bin encrypted_message.txt private.pem
 
 sendPublicKey() {
     #Creation des clés si elles n'existes pas 
-    if [ ! -f "publicKey/private_Server_key.pem" ]; then
-        openssl genpkey -algorithm RSA -out publicKey/private_Server_key.pem
+    if [ ! -f "server/key/private_Server_key.pem" ]; then
+        openssl genpkey -algorithm RSA -out server/key/private_Server_key.pem
     fi 
-    if [ ! -f "public_ssh_key.pub" ]; then
-        openssl rsa -in publicKey/private_Server_key.pem -pubout -out publicKey/public_Server_key.pem
+    if [ ! -f "server/key/public_ssh_key.pub" ]; then
+        openssl rsa -in server/key/private_Server_key.pem -pubout -out server/key/public_Server_key.pem
     fi 
 
     #envoie de la clé public du server au client 
-    cat publicKey/public_Server_key.pem | send $Client
+    cat server/key/public_Server_key.pem | send $Client
     echo "clé envoyé au client"
 
 }
@@ -98,7 +94,7 @@ verifConnexion() {
         echo "La fonction attend exactement 3 arguments."
         return 2
     fi
-    cat database/"$3"_database.txt | while read -r ligne
+    cat server/database/"$3"_database.txt | while read -r ligne
     do
         IDinFile=$(echo "$ligne" | cut -d ':' -f1)
         MDPinFile=$(echo "$ligne" | cut -d ':' -f9)
@@ -133,16 +129,16 @@ signature() {
 #signature $dataToSign $clientPrivateKey
 
 verificationSign() {
-    if [ $# -ne 2 ]; then
-        echo "La fonction attend exactement 2 arguments."
+    if [ $# -ne 3 ]; then
+        echo "La fonction attend exactement 3 arguments."
         return 2
     fi
 
     echo -n "$3" | openssl dgst -verify "$2" -keyform PEM -sha256 -signature "$1"
 
-    echo $?
+    return $?
 }
-#verificationSign $signedData clientpublicKey.pem #IDClient
+#verificationSign signedData.txt clientpublicKey.pem #IDClient
 
 
 convBase64() {
@@ -180,7 +176,7 @@ deconcatenation() {
     do  
         awk -v RS="$end_marker" '/'"$start_marker"'/{print substr($0, length("'"$start_marker"'")+1)}' <<< $(cat $1) | awk 'NR=='$i > deconcatenate$i.txt
     done
-    rm concatenateFile.txt
+    
 
 }
 #deconcatenation concatenateFile.txt 
@@ -201,7 +197,7 @@ verifVote() {
         echo "La fonction attend exactement 2 arguments."
         return 2
     fi
-    cat database/"$2"_database.txt | while read -r ligne
+    cat server/database/"$2"_database.txt | while read -r ligne
     do
         IDinFile=$(echo "$ligne" | cut -d ':' -f1)
         fingerprint=$(echo "$ligne" | cut -d ':' -f6)
@@ -217,7 +213,7 @@ verifVote() {
 #verifVote $ID $ville
 
 addInfo() {
-    file="database/"$4"_database.txt"
+    file="server/database/"$4"_database.txt"
     search_id=$1
     new_data=$2
 
