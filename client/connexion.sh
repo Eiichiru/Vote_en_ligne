@@ -89,7 +89,7 @@ while [[ $action -lt 1 || $action -gt 7 ]]; do
                 ;;
             5)
                 echo "6 : Créer une procuration"
-                ./client/creation_procuration.sh
+                ./client/creation_procuration.sh $ID
                 ;;
             6)
                 echo "7 : Déclarer une protestation"
