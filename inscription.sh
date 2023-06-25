@@ -72,5 +72,5 @@ echo "le fichier MyPrivateKey.pem a été placé sur votre clé USB"
 echo "Génération de la clé public pour le server ..." 
 openssl rsa -in client/key/MyPrivateKey.pem -pubout -out server/key/"$NNI"_public.pem
 
-echo "$NNI:$Nom:$Prenom:$adresse:$date::::$mdp1:$mdp2 " >> server/database/"$ville"_database.txt 
+echo "$NNI:$Nom:$Prenom:$adresse:$date:X:X:X:$mdp1:$mdp2 " >> server/database/"$ville"_database.txt 
 

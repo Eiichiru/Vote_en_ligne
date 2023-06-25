@@ -178,29 +178,35 @@ while true; do
         rm deconcatenate3.txt
 
         #dechiffrement du chiffré
-        dechiffrementPubKey deconv.txt server/key/private_Server_key.pem
+        dechif=$(dechiffrementPubKey deconv.txt server/key/private_Server_key.pem)
         rm deconv.txt
+        echo -n $dechif > decripFile.txt
 
         #deconcatenation des infos
-        deconcatenation decrypted_file.txt 
+        deconcatenation decripFile.txt 
         #deconcatenate1.txt=IDProcu ; deconcatenate2.txt=tempProcu
 
-        #verification de si l'utilisateur existe et prise en compte de la procuration 
-        if [ $(existUser $(cat deconcatenate1.txt)) -eq 1 ]; then
-            addInfo $(cat deconcatenate1.txt) $ID"$" col7
+        #verification de si l'utilisateur existe et prise en compte de la procuration
+        result=$(existUser $(cat deconcatenate1.txt))
+
+        city=$(getCitybyIDuser $(cat deconcatenate1.txt))
+
+        if [ "$result" -eq 0 ]; then
+            addInfo $(cat deconcatenate1.txt) $ID"-" col7 $city
 
             #creation de la date à ajouter dans la 8e colonne en fonction du choix de l'utilisateur 
-            case $(cat deconcatenate2.txt) in
+            tempProcu=$(cat deconcatenate2.txt)
+            case $tempProcu in
                 1)
-                addInfo $(cat deconcatenate1.txt) $NextElection"$" col8
+                addInfo $(cat deconcatenate1.txt) $NextElection"-" col8 $city
                 ;;
                 2)
                 date=$(date -v+2y +"%d/%m/%Y")
-                addInfo $(cat deconcatenate1.txt) $date"$" col8
+                addInfo $(cat deconcatenate1.txt) $date"-" col8 $city
                 ;;
                 3)
                 date=$(date -v+3y +"%d/%m/%Y")
-                addInfo $(cat deconcatenate1.txt) $date"$" col8
+                addInfo $(cat deconcatenate1.txt) $date"-" col8 $city
                 ;;
             esac  
             send $Client <<< "ProcuOk"
@@ -211,7 +217,7 @@ while true; do
 
         #envoie de la reponse au client
 
-        rm deconcatenate1.txt deconcatenate2.txt
+        rm deconcatenate1.txt deconcatenate2.txt tempProcu.txt decrypted_key.txt decripFile.txt IDprocu.txt
         ;;
     "...")
         echo "..."
