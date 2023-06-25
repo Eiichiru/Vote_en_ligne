@@ -16,7 +16,7 @@ echo Son prenom :
 read prenom
 echo Son nom :
 read nom
-echo "Pendant combien de temps "$prénom $nom" 
+echo "Pendant combien de temps "$prenom $nom" 
 aura t-il le droit de voter pour vous ? 
 1 : La prochaine élection
 2 : 2 ans
@@ -81,7 +81,7 @@ fi
 #reception de la reponse de prise en compte de la procuration
 if [ $(recv $Client) == "ProcuOk" ] ; then
     echo "INFO : Procuration prise en compte : $prenom $nom 
-        pourra voter pour vous." && exit 0
+pourra voter pour vous." && exit 0
 else
     echo "ERREUR : L'ID que vous avez fournis ne correspond à aucun utilisateur " && exit 1
 fi

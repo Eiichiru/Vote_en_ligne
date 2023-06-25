@@ -221,7 +221,7 @@ addInfo() {
     temp_file=$(mktemp)
 
     # Parcours du fichier et mise à jour de la ligne appropriée
-    cat "$file" | while IFS=: read -r col1 col2 col3 col4 col5 col6 col7 col8; do
+    cat "$file" | while IFS=: read -r col1 col2 col3 col4 col5 col6 col7 col8 col9 col10; do
         if [ "$col1" = "$search_id" ]; then
             case $3 in
             "col2")
@@ -245,9 +245,15 @@ addInfo() {
             "col8")
                 col8=$2
                 ;;
+            "col9")
+                col9=$2
+                ;;
+            "col10")
+                col10=$2
+                ;;
             esac
         fi
-        echo "$col1:$col2:$col3:$col4:$col5:$col6:$col7:$col8" >> "$temp_file"
+        echo "$col1:$col2:$col3:$col4:$col5:$col6:$col7:$col8:$col9:$col10" >> "$temp_file"
     done
 
     # Remplacement du fichier d'origine par le fichier temporaire modifié
@@ -261,11 +267,25 @@ existUser() {
         do
             premiere_colonne=$(echo "$ligne" | cut -d ':' -f1)
             if [ "$premiere_colonne" = "$1" ]; then
-                return 0
-            else
-                return 1
+                echo 0
+                break 
             fi
         done
     done
 }
 #existUser IDProcu 
+
+getCitybyIDuser() {
+    for fichier in server/database/*_database.txt; do
+        cat "$fichier" | while read -r ligne
+        do
+            premiere_colonne=$(echo "$ligne" | cut -d ':' -f1)
+            if [ "$premiere_colonne" = "$1" ]; then
+                temp=$(echo "$fichier" | cut -d '_' -f1)
+                city=$(echo "$temp" | cut -d '/' -f3)
+                echo $city
+            fi
+        done
+    done
+}
+getCitybyIDuser $ID

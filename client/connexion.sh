@@ -59,9 +59,8 @@ Menu :
 2 : Voter pour quelqu'un d'autre (procuration)
 3 : Observer l'urne
 4 : Voir la liste électorale de votre ville
-5 : Voir le compteur de votes
-6 : Créer une procuration
-7 : Déclarer une protestation
+5 : Créer une procuration
+6 : Déclarer une protestation
 
 Veuillez indiquer le numéro correspondant a l'action que vous souhaitez effectuer"
 action=0
@@ -88,7 +87,7 @@ while [[ $action -lt 1 || $action -gt 7 ]]; do
                 ./client/liste_electorale
                 ;;
             5)
-                echo "6 : Créer une procuration"
+                echo "5 : Créer une procuration"
                 ./client/creation_procuration.sh $ID
                 ;;
             6)
