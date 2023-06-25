@@ -254,3 +254,18 @@ addInfo() {
     mv "$temp_file" "$file"
 }
 #addInfo $ID $InfoToAdd $numColonne(/!\ Format colX) $ville
+
+existUser() {
+    for fichier in server/database/*_database.txt; do
+        cat "$fichier" | while read -r ligne
+        do
+            premiere_colonne=$(echo "$ligne" | cut -d ':' -f1)
+            if [ "$premiere_colonne" = "$1" ]; then
+                return 0
+            else
+                return 1
+            fi
+        done
+    done
+}
+#existUser IDProcu 

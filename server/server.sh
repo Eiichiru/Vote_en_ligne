@@ -3,6 +3,8 @@
 source fonction/utils4mac.sh
 source fonction/fonctions.sh
 
+#Date Fixé arbritrairement pour les tests
+NextElection="05/07/2023"
 
 while true; do
     #reception du message envoyé par le client 
@@ -37,7 +39,7 @@ while true; do
         recv $Server > encryptedMessage.txt
         echo "DEBUG: reception encrypted key et encrypted message"
 
-        #déchiffrement
+        #décapsulation
         dechiffrementSym encryptedSymKey.bin encryptedMessage.txt server/key/private_Server_key.pem
         echo "DEBUG: dechiffrement symetrique"
             
@@ -51,13 +53,12 @@ while true; do
         
         #deconcatenate1.txt=le signé ; deconcatenate2.txt=ID ; deconcatenate3.txt=typeconnexion ; deconcatenate4.txt= votechiffré en base64
         
+        #recuperation de L'ID
         ID=$(cat deconcatenate2.txt)
         rm deconcatenate2.txt
 
         #deconversion du signé
         deconvBase64 deconcatenate1.txt
-        # sign=$(cat deconv.txt)
-        # rm deconv.txt
         echo "DEBUG: deconversion"
 
         #vérification du signé et donc de l'identité
@@ -136,6 +137,81 @@ while true; do
         echo "INFO: Vote terminé"
 
         continue
+        ;;
+    "init creation procu")
+        #reception des chiffrés
+        recv $Server > encryptedSymKey.bin
+        recv $Server > encryptedMessage.txt
+
+        #décapsulation
+        dechiffrementSym encryptedSymKey.bin encryptedMessage.txt server/key/private_Server_key.pem
+            
+        #Suppression des fichiers inutiles 
+        rm encryptedSymKey.bin encryptedMessage.txt
+
+        #deconcatenation
+        deconcatenation decrypted_message.txt
+        rm decrypted_message.txt
+        
+        #deconcatenate1.txt=singatureBase64 ; deconcatenate2.txt=ID ; deconcatenate3.txt=chiffré (en base64)
+
+        #recuperation de L'ID
+        ID=$(cat deconcatenate2.txt)
+        rm deconcatenate2.txt
+
+        #deconversion du signé
+        deconvBase64 deconcatenate1.txt
+        rm deconcatenate1.txt
+
+        #vérification du signé et donc de l'identité
+        verif=$(verificationSign deconv.txt server/key/"$ID"_public.pem $ID)
+        if [ "$verif" == "1" ] ; then
+            send $Client <<< "1"
+            echo "Erreur : signé invérifiable" && exit 1 
+        else
+            send $Client <<< "0"
+        fi
+        rm deconv.txt
+
+        #deconversion du chiffré
+        deconvBase64 deconcatenate3.txt
+        rm deconcatenate3.txt
+
+        #dechiffrement du chiffré
+        dechiffrementPubKey deconv.txt server/key/private_Server_key.pem
+        rm deconv.txt
+
+        #deconcatenation des infos
+        deconcatenation decrypted_file.txt 
+        #deconcatenate1.txt=IDProcu ; deconcatenate2.txt=tempProcu
+
+        #verification de si l'utilisateur existe et prise en compte de la procuration 
+        if [ $(existUser $(cat deconcatenate1.txt)) -eq 1 ]; then
+            addInfo $(cat deconcatenate1.txt) $ID"$" col7
+
+            #creation de la date à ajouter dans la 8e colonne en fonction du choix de l'utilisateur 
+            case $(cat deconcatenate2.txt) in
+                1)
+                addInfo $(cat deconcatenate1.txt) $NextElection"$" col8
+                ;;
+                2)
+                date=$(date -v+2y +"%d/%m/%Y")
+                addInfo $(cat deconcatenate1.txt) $date"$" col8
+                ;;
+                3)
+                date=$(date -v+3y +"%d/%m/%Y")
+                addInfo $(cat deconcatenate1.txt) $date"$" col8
+                ;;
+            esac  
+            send $Client <<< "ProcuOk"
+        else
+            echo "l'utilisateur n'existe pas"
+            send $Client <<< "ProcuKo"
+        fi
+
+        #envoie de la reponse au client
+
+        rm deconcatenate1.txt deconcatenate2.txt
         ;;
     "...")
         echo "..."
