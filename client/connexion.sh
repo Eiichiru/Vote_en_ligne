@@ -75,7 +75,7 @@ while [[ $action -lt 1 || $action -gt 7 ]]; do
                 ;;
             2)
                 echo "2 : Voter pour quelqu'un d'autre (procuration)"
-                ./client/vote_procuration.sh
+                ./client/vote_procuration.sh $ID $typeConnexion
                 ;;
             3)
                 echo "3 : Observer l'urne"
