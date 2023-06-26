@@ -31,6 +31,8 @@ while true; do
         #fonction de verification id/mdp
         verifConnexion $ID $MDP $ville
 
+        typeConnexion=$(recv $Server)
+
         continue
         ;;
     "init vote")
@@ -98,12 +100,11 @@ while true; do
         echo "DEBUG: création du hashé"
 
         #vérification de type de connexion 
-        if [ "$2" == "1" ] ; then
+        if [ "$typeConnexion" == "1" ] ; then
             #prise en compte du vrai vote 
             #nextStep : chiffrer avec clé public d'une instance au dessus
             cat deconcatenate4.txt >> server/database/"$ville"_vote.txt
             rm deconcatenate4.txt
-            rm base64.bin
         else    
             #creation d'un vote blanc pour que le vote ne soit pas prit en compte
             #nextStep : chiffrer avec clé public d'une instance au dessus
@@ -303,7 +304,7 @@ while true; do
         echo "DEBUG : hashé creation"
 
         #vérification de type de connexion 
-        if [ "$2" == "1" ] ; then
+        if [ "$typeConnexion" == "1" ] ; then
             #prise en compte du vrai vote 
             #nextStep : chiffrer avec clé public d'une instance au dessus
             cat deconcatenate4.txt >> server/database/"$ville"_vote.txt
@@ -329,8 +330,7 @@ while true; do
         #envoie de la reponse au client
         send $Client <<< "voteOk"
         
-        rm deconcatenate3.txt
-        rm deconcatenate4.txt
+        rm deconcatenate3.txt deconcatenate1.txt hash.txt deconcatenate5.txt
         rm decrypted_key.txt
 
         echo "INFO: Vote terminé"

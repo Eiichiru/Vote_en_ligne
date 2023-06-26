@@ -174,7 +174,7 @@ deconcatenation() {
     #recupation de chaque partie 
     for (( i=1; i<=$nbFile; i++ ))
     do  
-        awk -v RS="$end_marker" '/'"$start_marker"'/{print substr($0, length("'"$start_marker"'")+1)}' <<< $(cat $1) | awk 'NR=='$i > deconcatenate$i.txt
+        tr -d '\n' < "$1" | awk -v RS="$end_marker" '/'"$start_marker"'/{print substr($0, length("'"$start_marker"'")+1)}' | awk 'NR=='$i > deconcatenate$i.txt
     done
     
 
