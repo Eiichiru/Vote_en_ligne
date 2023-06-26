@@ -52,6 +52,9 @@ case "$reponse" in
     ;;
 esac
 
+#envoie le type de connexion au server
+send $Server <<< $typeConnexion
+
 echo "
 Bienvenue sur votre bureau de vote en ligne.
 Menu :

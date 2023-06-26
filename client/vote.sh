@@ -70,6 +70,7 @@ send $Server <<< "init vote"
 
     #concatenations
     echo -n "$1" >> ID.txt
+    echo -n "$2" >> typeConnexion.txt
     concatenation signature64.bin ID.txt typeConnexion.txt base64.bin
     rm signature64.bin ID.txt typeConnexion.txt base64.bin
     echo "DEBUG: concatenation"
