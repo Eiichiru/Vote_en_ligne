@@ -3,4 +3,4 @@
 source fonction/utils.sh
 source fonction/fonctions.sh
 
-addInfo 1234 fingerprint col6 amiens
+verifRightProcu 1234 "amiens" 4321 "26/06/2025"

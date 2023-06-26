@@ -202,7 +202,7 @@ verifVote() {
         IDinFile=$(echo "$ligne" | cut -d ':' -f1)
         fingerprint=$(echo "$ligne" | cut -d ':' -f6)
         if [ "$IDinFile" = "$1" ] ; then
-            if [ "$fingerprint" = "" ] ; then
+            if [ "$fingerprint" = "X" ] ; then
                 echo 0
             else
                 echo 1
@@ -288,4 +288,38 @@ getCitybyIDuser() {
         done
     done
 }
-getCitybyIDuser $ID
+#getCitybyIDuser $ID
+
+verifRightProcu() {
+    if [ $# -ne 4 ]; then
+        echo "La fonction attend exactement 4 arguments."
+        return 2
+    fi
+    cat server/database/"$2"_database.txt | while read -r ligne
+    cpt=0
+    do
+        IDinFile=$(echo "$ligne" | cut -d ':' -f1)
+        if [ "$IDinFile" = "$1" ] ; then
+            IDprocuInFile=$(echo "$ligne" | cut -d ':' -f7)
+            DateprocuInFile=$(echo "$ligne" | cut -d ':' -f8)
+            IFS='-' read -ra ids <<< "$IDprocuInFile"
+            IFS='-' read -ra dates <<< "$DateprocuInFile"
+            for id in "${ids[@]}"; do
+                if [ "$id" = "$3" ]; then
+                    #echo "id : "$id
+                    #echo "date : "${dates[$cpt]} 
+                    num_date1=$(date -j -f "%d/%m/%Y" "$4" +"%s")
+                    num_date2=$(date -j -f "%d/%m/%Y" "${dates[$cpt]}" +"%s")
+                    
+                    if [ "$num_date1" -le "$num_date2" ]; then
+                        echo 0
+                        exit 0
+                    fi 
+                fi
+                ((cpt++))
+            done
+        fi
+    done
+}
+#verifRightProcu $ID $ville $IDprocu date
+
