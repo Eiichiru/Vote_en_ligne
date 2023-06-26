@@ -1,0 +1,5 @@
+25022001:Vbn:Mario:ufr amiens:06/25/2023:X:::0MbNLtd8:EHEgGYRd 
+1234:v:m:40 rue mili:06/26/2023:oeoeoeoe:::bKp97r2O:ZsTHFjjY 
+9999:VB:Mario:252 rue victor hugo:06/26/2023:X:X:X:DOh97zUb:9uXJ5y0a 
+12345:Test:Testa:20 rue cirque:06/26/2023:X:X:X:rV6p9lzL:LGZrUNzl 
+123456:Vn:Mn:22 rue af:06/26/2023:fdhbtfnjfjhgd:X:X:K55nSJKz:RvIIx6KT 
