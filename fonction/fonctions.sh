@@ -34,10 +34,12 @@ dechiffrementSym() {
 
     iv="6a0cd1c23b6319e2a97fcc5a60be848e"
 
+    echo "DEBUG : avant déchiffrement avec clé privé"
     #Dechiffrement de la clé symetrique avec la clé privé du serveur 
     openssl rsautl -decrypt -inkey $3 -in $1 -out decrypted_key.txt
     symKey=$(cat decrypted_key.txt)
-
+    echo "symkey :"$symKey
+    echo "DEBUG : avant déchiffrement avec clé symetrique"
     #Dechiffrement du message avec la clé symétrique 
     openssl enc -d -aes-256-cbc -K $symKey -iv "$iv" -in $2 -out decrypted_message.txt
     #cat decrypted_message.txt
@@ -111,6 +113,7 @@ verifConnexion() {
             fi
         fi
     done
+    chmod a+r server/database/"$3"_database.txt
 
 }
 #verifConnexion $ID $MDP $ville
@@ -323,3 +326,32 @@ verifRightProcu() {
 }
 #verifRightProcu $ID $ville $IDprocu date
 
+getUrne() {
+    if [ $# -ne 1 ]; then
+        echo "La fonction attend exactement 1 arguments."
+        return 2
+    fi
+    #echo server/database/"$1"_database.txt
+    cat server/database/"$1"_database.txt | while read -r ligne
+    do
+        fingerprint=$(echo "$ligne" | cut -d ':' -f6)
+        if [ "$fingerprint" != "X" ]; then
+            echo $fingerprint >> urne.txt
+        fi
+    done
+
+}
+#getUrne $ville
+
+getNbVotebyUrne() {
+    nbVote=$(cat $1 | wc -l | tr -d ' ')
+    echo $nbVote
+}
+#getNbVotebyUrne $urne.txt
+
+getNbVote() {
+    nbVote=$(cat server/database/"$1"_vote.txt | wc -l | tr -d ' ')
+    echo $nbVote
+
+}
+#getNbVote $ville

@@ -8,8 +8,9 @@ NextElection="05/07/2023"
 
 while true; do
     #reception du message envoyé par le client 
+    echo "DEBUG : avant reception "
     MSG=$(recv $Server || echo "Erreur de reception !" >&2)
-    
+    echo "> Action : "$MSG
     case "$MSG" in
     "init connexion")
         #envoie de la clé public au client
@@ -17,6 +18,7 @@ while true; do
 
         #reception de L'ID
         ID=$(recv $Server)
+        currentIDconnect=$ID
 
         #reception du mdp chiffré
         recv $Server > encrypted_password.txt
@@ -33,6 +35,7 @@ while true; do
 
         typeConnexion=$(recv $Server)
 
+        echo "DEBUG : connecté "
         continue
         ;;
     "init vote")
@@ -129,7 +132,6 @@ while true; do
         send $Client <<< "voteOk"
         
         rm deconcatenate3.txt
-        rm deconcatenate4.txt
         rm decrypted_key.txt
 
         echo "INFO: Vote terminé"
@@ -216,6 +218,7 @@ while true; do
         #envoie de la reponse au client
 
         rm deconcatenate1.txt deconcatenate2.txt tempProcu.txt decrypted_key.txt decripFile.txt IDprocu.txt
+        continue
         ;;
     "init voteProcu")
         #reception des chiffrés
@@ -337,6 +340,68 @@ while true; do
 
         continue
         ;;
+    "init urne")
+        echo "DEBUG : start"
+        echo "ID : "$currentIDconnect
+        city=$(getCitybyIDuser $currentIDconnect)
+        
+        echo "DEBUG : Debut get urne"
+        #parsing du fichier database
+        getUrne $city
+        echo "DEBUG : getUrne"
+
+        #creation de la signature du server
+        signature $currentIDconnect server/key/private_Server_Key.pem
+        convBase64 signature.sign
+        mv base64.bin signatures64.bin
+        echo "DEBUG : create signature"
+
+        #recuperation du nombre de vote
+        cat urne.txt
+        echo " --- "
+        nbVote1=$(getNbVote $city)
+        echo "DEBUG : getnbVote1"
+        nbVote2=$(getNbVotebyUrne urne.txt)
+        echo "DEBUG : getnbVote2"
+        
+
+        #verification
+        if [ "$nbVote1" -ne "$nbVote2" ] ; then
+            echo "ERREUR : nbVote non synchro"
+            send $Client <<< "1"
+            exit 1
+        else
+            send $Client <<< "0"
+        fi
+        echo "DEBUG : nbVote diff"
+
+        echo -n $nbVote1 > nbVote.txt
+        echo -n $currentIDconnect > ID.txt
+
+        #conversion de l'urne en base64
+        convBase64 urne.txt
+        mv base64.bin urne64.bin
+        rm urne.txt
+
+        #concatenation
+        concatenation signatures64.bin ID.txt urne64.bin nbVote.txt
+        rm nbVote.txt ID.txt urne64.bin signatures64.bin
+        echo "DEBUG : concatenation"
+
+        #chiffrement
+        chiffrementSym concatenateFile.txt server/key/"$currentIDconnect"_public.pem
+        rm concatenateFile.txt
+        echo "DEBUG : chiff"
+
+        #envoie au client 
+        cat encrypted_key.bin | send $Client
+        cat encrypted_message.txt | send $Client
+        echo "DEBUG : send to client"
+
+        rm encrypted_key.bin
+        rm encrypted_message.txt
+        continue
+        ;;
     "...")
         echo "..."
         continue
@@ -366,6 +431,7 @@ while true; do
 
     *)
         echo "erreur"
+        continue
         ;;
     
     

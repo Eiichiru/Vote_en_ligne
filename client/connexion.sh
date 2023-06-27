@@ -82,8 +82,7 @@ while [[ $action -lt 1 || $action -gt 7 ]]; do
                 ;;
             3)
                 echo "3 : Observer l'urne"
-                ./client/urne
-                # + compteur
+                ./client/urne.sh $ID
                 ;;
             4)
                 echo "4 : Voir la liste électorale de votre ville"
