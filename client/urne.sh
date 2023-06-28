@@ -37,7 +37,6 @@ mv deconv.txt signe.txt
 #deconversion de l'urne
 deconvBase64 deconcatenate3.txt
 mv deconv.txt urne.txt
-cat urne.txt
 
 #vérification du signé et donc de l'identité
 verif=$(verificationSign signe.txt client/key/serverPublicKey.pub $1)

@@ -30,12 +30,14 @@ while true; do
         MDP=$(dechiffrementPubKey encrypted_password.txt server/key/private_Server_key.pem)
         rm encrypted_password.txt
 
+        echo "DEBUG : avant verif connexion"
         #fonction de verification id/mdp
         verifConnexion $ID $MDP $ville
+        echo "DEBUG : apres verif connexion"
 
         typeConnexion=$(recv $Server)
-
-        echo "DEBUG : connecté "
+        echo "DEBUG : type connexion recu"
+        
         continue
         ;;
     "init vote")
