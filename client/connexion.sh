@@ -52,7 +52,9 @@ case "$reponse" in
     ;;
 esac
 
+echo "DEBUG : avant envoie type connexion"
 #envoie le type de connexion au server
+sleep 1
 send $Server <<< $typeConnexion
 
 echo "
@@ -100,4 +102,5 @@ while [[ $action -lt 1 || $action -gt 7 ]]; do
     else
         echo "Le chiffre n'est pas valide. Veuillez entrer un chiffre entre 1 et 7."
     fi 
+    #send $Server <<< "end connexion time"
 done
