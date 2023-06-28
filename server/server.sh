@@ -408,10 +408,35 @@ while true; do
         echo "..."
         continue
         ;;
+    
+    "init liste")
+
+        #Reception de la ville
+        ville=$(recv $Server || echo "Erreur de reception !" >&2)
+        filename="server/database/"$ville"_database.txt"
+
+        while IFS=":" read -r col1 col2 col3 col4 col5 col6 col7
+        do
+            if [[ "$col6" == "X" ]]; then
+                col6="Pas de vote"
+            else
+                col6="A vote"
+            fi
+
+            echo "$col1 $col2 $col3 $col6" >> "tempDB.txt"
+        done < "$filename"
+
+        sleep 1
+        send "$Client" < <(cat "tempDB.txt")
+        rm tempDB.txt
+        ;;
+
     *)
         echo "erreur"
         continue
         ;;
+    
+    
     esac
 
     sleep 1

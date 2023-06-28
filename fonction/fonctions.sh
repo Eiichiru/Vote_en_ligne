@@ -1,4 +1,4 @@
-source fonction/utils4mac.sh
+source fonction/utils.sh
 
 #openssl genpkey -algorithm RSA -out private.pem
 #openssl rsa -in private.pem -pubout -out public.pem
