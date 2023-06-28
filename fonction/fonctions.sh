@@ -89,7 +89,7 @@ dechiffrementPubKey() {
     cat decrypted_file.txt
     rm decrypted_file.txt
 }
-#chiffrement encrypted_file.txt publicKey/private_Server_key.pem
+#dechiffrement encrypted_file.txt privateKey/private_Server_key.pem
 
 verifConnexion() {
     if [ $# -ne 3 ]; then

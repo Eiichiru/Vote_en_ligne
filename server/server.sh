@@ -113,7 +113,7 @@ while true; do
         else    
             #creation d'un vote blanc pour que le vote ne soit pas prit en compte
             #nextStep : chiffrer avec clé public d'une instance au dessus
-            chiffrementPubKey VoteBlanc server/key/public_Server_key.pem
+            chiffrementPubKey "4" server/key/public_Server_key.pem
             convBase64 encrypted_file.bin
             cat base64.bin >> server/database/"$ville"_vote.txt
             rm encrypted_file.bin
@@ -318,7 +318,7 @@ while true; do
         else    
             #creation d'un vote blanc pour que le vote ne soit pas prit en compte
             #nextStep : chiffrer avec clé public d'une instance au dessus
-            chiffrementPubKey VoteBlanc server/key/public_Server_key.pem
+            chiffrementPubKey "4" server/key/public_Server_key.pem
             convBase64 encrypted_file.bin
             cat base64.bin >> server/database/"$ville"_vote.txt
             rm encrypted_file.bin
