@@ -88,7 +88,7 @@ while [[ $action -lt 1 || $action -gt 7 ]]; do
                 ;;
             4)
                 echo "4 : Voir la liste électorale de votre ville"
-                ./client/liste_electorale
+                ./client/liste_electorale.sh
                 ;;
             5)
                 echo "5 : Créer une procuration"
