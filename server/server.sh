@@ -312,8 +312,8 @@ while true; do
         if [ "$typeConnexion" == "1" ] ; then
             #prise en compte du vrai vote 
             #nextStep : chiffrer avec clé public d'une instance au dessus
-            cat deconcatenate4.txt >> server/database/"$ville"_vote.txt
-            rm deconcatenate4.txt
+            cat deconcatenate5.txt >> server/database/"$ville"_vote.txt
+            rm deconcatenate5.txt
             rm base64.bin
         else    
             #creation d'un vote blanc pour que le vote ne soit pas prit en compte
